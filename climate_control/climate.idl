@@ -1,0 +1,80 @@
+#pragma prefix "acme.com"
+module CCS
+{
+  typedef unsigned long AssetType;
+  typedef string        ModelType;
+  typedef short         TempType;
+  typedef string        LocType;
+
+  interface Thermometer 
+  {
+     readonly attribute ModelType model;
+     readonly attribute AssetType assetNum;
+     readonly attribute TempType  temperature;
+              attribute LocType   location;
+  };
+
+  interface Thermostat : Thermometer
+  {
+     struct BtData
+     {
+        TempType requested;
+        TempType minRequested;
+        TempType maxRequested;
+        string   errorMsg;
+     };
+     exception BadTemp 
+     {
+        BtData details;
+     };
+
+     TempType getNominal();
+     TempType setNominal(in TempType newTemp) raises(BadTemp);
+  };
+
+  interface Controller
+  {
+     typedef sequence<Thermometer> ThermometerSeq;
+     typedef sequence<Thermostat> ThermostatSeq;
+
+     struct ErrorDetails
+     {
+        Thermostat  tmstatRef;
+        Thermostat::BtData info;
+     };
+
+     typedef sequence<ErrorDetails> ErrSeq;
+     exception EChange
+     {
+        ErrSeq errors;
+     };
+
+     enum SearchCriterion
+     {
+        ASSET,
+        LOCATION,
+        MODEL
+     };
+     union KeyType switch(SearchCriterion)
+     {
+        case ASSET:
+           AssetType assetNum;
+        case LOCATION:
+         LocType loc;
+        case MODEL:
+           ModelType modelDesc;
+     };
+
+     struct SearchType
+     {
+        KeyType key;
+        Thermometer device;
+     };
+     typedef sequence<SearchType> SearchSeq;
+
+     void find(inout SearchSeq slist);
+     void change(in ThermostatSeq tlist, in short delta) raises(EChange);
+     ThermometerSeq list();
+
+  };
+};
