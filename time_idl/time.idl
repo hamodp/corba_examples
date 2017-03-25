@@ -1,0 +1,10 @@
+struct TimeOfDay{
+  short hour;    //0-23
+  short minute;  //0-59
+  short second;  //0-59
+};
+
+//returns green-which time
+interface Time {
+  TimeOfDay get_gmt();
+};
