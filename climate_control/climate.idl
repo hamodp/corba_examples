@@ -19,8 +19,8 @@ module CCS
      struct BtData
      {
         TempType requested;
-        TempType minRequested;
-        TempType maxRequested;
+        TempType minPermitted;
+        TempType maxPermitted;
         string   errorMsg;
      };
      exception BadTemp 
