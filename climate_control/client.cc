@@ -220,10 +220,58 @@ int main(int argc, char * argv [])
          cout <<endl;
       }
       
+      // Look for devices in the rooms Earth and Hal. This must find at least 
+      // one device because we earlier changed the location of the first device
+      // to room Earth.
+      cout << "Looking for devices in Earth and Hal." << endl;
+      CCS::Controller::SearchSeq ss;
+      ss.length(2);
+      ss[0].key.loc(CORBA::string_dup("Earth"));
+      ss[1].key.loc(CORBA::string_dup("Hal"));
+      ctrl->find(ss);
       
+      // Show the devices found in that room
+      for(CORBA::ULong i=0; i<ss.length();i++)
+      {
+         cout << ss[i].device;            // overloaded <<
+      } 
+      cout << endl;
+      
+      // Increase the temperature of all thermostats by 40 degrees. First, make
+      // a list (tss) containing only a thermostats.
+      cout << "Increasing the temperature by 40 degrees." <<endl;
+      CCS::Controller::ThermostatSeq tss;
+      for(CORBA::ULong i=0; i<list->length();i++)
+      {
+         tmstat = CCS::Thermostat::_narrow(list[i]);
+         if(CORBA::is_nil(tmstat))
+         {
+            continue;
+         }
+         
+         len = tss.length();
+         tss.length(len+1);
+         tss[len] = tmstat;
+      }
+      
+      // Try to change all thermostats.
+      try
+      {
+         ctrl->change(tss,40);
+      }
+      catch(const CCS::Controller::EChange & ec)
+      {
+         cerr << ec;         // overloaded <<
+      }
+   }
+   catch(const CORBA::Exception & e)
+   {
+      cerr << "Uncaught CORBA exception: " << e << endl;
    }
    catch(...)
    {
-   
+      return 1;  
    }
+   
+   return 0;
 }

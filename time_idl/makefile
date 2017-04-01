@@ -1,5 +1,5 @@
 CC            = /usr/bin/g++
-CPPFLAGS      = -g -c
+CPPFLAGS      = -g -c -wall
 LDFLAGS       = -g
 OMNI_HOME     = /home/patrick/Downloads/omniORB-4.2.1
 OMNI_INCLUDES = -I$(OMNI_HOME)/include
